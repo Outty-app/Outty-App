@@ -4,6 +4,6 @@ This team project aims to build an outdoor app (called Outty) for adventure seek
 Project coontributors and Roles:
 - Roan Simo Masso: Product owner
 - Andre Dumas: Scrum Master
-- Oluwatomisin Adegbayi:
-- Tobechukwu Eziolise:
-- Andre Steeve Mocto Ngatchouissi:
+- Oluwatomisin Adegbayi: Developer
+- Tobechukwu Eziolise: Developer
+- Andre Steeve Mocto Ngatchouissi: Developer
