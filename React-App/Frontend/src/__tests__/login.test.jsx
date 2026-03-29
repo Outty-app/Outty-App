@@ -68,3 +68,72 @@ describe('Login Component', () => {
         });
     })
 });
+
+it('should show authentication error for wrong password', async () => {
+  signInWithEmailAndPassword.mockRejectedValueOnce(
+    new Error('Invalid credentials')
+  );
+
+  render(<Login />);
+
+  fireEvent.change(screen.getByLabelText('email'), {
+    target: { value: 'test@example.com' },
+  });
+
+  fireEvent.change(screen.getByLabelText('password'), {
+    target: { value: 'wrongpassword' },
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: /login/i }));
+
+  expect(
+    await screen.findByText('Invalid email or password.')
+  ).toBeInTheDocument();
+});
+it('should show authentication error for wrong email', async () => {
+  
+  signInWithEmailAndPassword.mockRejectedValueOnce(
+    new Error('Invalid credentials')
+  );
+
+  render(<Login />);
+
+  
+  fireEvent.change(screen.getByLabelText('email'), {
+    target: { value: 'wrong@example.com' },
+  });
+
+  fireEvent.change(screen.getByLabelText('password'), {
+    target: { value: '123456' },
+  });
+
+  
+  fireEvent.click(screen.getByRole('button', { name: /login/i }));
+
+  
+  expect(await screen.findByText('Invalid email or password.')).toBeInTheDocument();
+});
+
+it('should call login function with correct credentials', async () => {
+  signInWithEmailAndPassword.mockResolvedValueOnce({});
+
+  render(<Login />);
+
+  fireEvent.change(screen.getByLabelText('email'), {
+    target: { value: 'test@example.com' },
+  });
+
+  fireEvent.change(screen.getByLabelText('password'), {
+    target: { value: '123456' },
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: /login/i }));
+
+  await waitFor(() => {
+    expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
+      expect.anything(),
+      'test@example.com',
+      '123456'
+    );
+  });
+});
