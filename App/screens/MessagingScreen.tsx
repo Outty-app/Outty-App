@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Image } from 'react-native';
 import {
   View,
   Text,
@@ -6,26 +7,36 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
-export default function MessagingScreen() {
+export default function MessagingScreen() 
+{
   const [loading, setLoading] = useState(false);
 
-  const handleAddTestEntry = async () => {
-    try {
+  const handleAddTestEntry = async () => 
+  {
+    try 
+    {
       setLoading(true);
 
-      const docRef = await addDoc(collection(db, 'andre-messages'), {
+      const customId = 'andre-test-message';
+
+      await setDoc(doc(db, 'andre-messages', customId), 
+      {
         message: 'Hello from MessagingScreen',
         createdAt: serverTimestamp(),
       });
 
-      Alert.alert('Success', `Entry added with ID: ${docRef.id}`);
-    } catch (error) {
+      Alert.alert('Success', `Entry added with ID: ${customId}`);
+    } 
+    catch (error) 
+    {
       console.error('Error adding document:', error);
       Alert.alert('Error', 'Could not add entry.');
-    } finally {
+    } 
+    finally 
+    {
       setLoading(false);
     }
   };
@@ -33,8 +44,51 @@ export default function MessagingScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.title}>Outty Main App</Text>
-        <Text style={styles.subtitle}>Tap below to add a Firestore test entry.</Text>
+
+        <View style={styles.topBar}>
+          <View style={styles.profileImageOuterDiv}>
+            <Image
+              source={require('../temp-images/hiker_stock.png')}
+              style={styles.profileImage} />
+          </View>
+
+          <View style={styles.userInfo}>
+            <Text style={styles.userName}>John Doe</Text>
+            <Text>Online</Text>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.messagesOuterContainer}>
+          <View style={{ flexDirection: 'row' }}>
+            <Image
+              source={require('../temp-images/hiker_stock.png')}
+              style={styles.messagesProfileIcon} />
+
+            <View style={styles.incomingGroup}>
+              <View style={styles.incomingMessage}>
+                <Text style={{ color: '#000' }}>
+                  Hi. It is very nice to match with you.
+                </Text>
+              </View>
+
+              <Text style={styles.messageTimestamp}>10:30 AM</Text>
+            </View>
+          </View>
+
+          <View>
+            <View style={styles.outgoingGroup}>
+              <View style={styles.outgoingMessage}>
+                <Text style={{ color: '#fff' }}>
+                  Nice to meet you as well. Your profile says you like hiking...
+                </Text>
+              </View>
+
+              <Text style={styles.messageTimestamp}>11:18 AM</Text>
+            </View>
+          </View>
+        </View>
 
         <TouchableOpacity
           style={styles.button}
@@ -62,8 +116,9 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   card: {
+    height: 1000,
     width: '100%',
-    maxWidth: 420,
+    maxWidth: 1000,
     backgroundColor: '#fff',
     borderRadius: 20,
     padding: 24,
@@ -72,17 +127,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 16,
     elevation: 6,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 20,
   },
   button: {
     backgroundColor: GREEN,
@@ -95,4 +139,90 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
+
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start'
+  },
+
+  profileImageOuterDiv: {
+
+  },
+
+  divider: {
+    borderBottomColor: '#000',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    marginVertical: 12,
+  },
+
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 60,
+    marginBottom: 16,
+  },
+
+  userInfo: {
+    paddingLeft: 10,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    paddingBottom: 15
+  },
+
+  userName: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    paddingBottom: 2,
+  },
+
+  messagesOuterContainer: {
+    minHeight: 600,
+    minWidth: 100,
+    borderColor: '#000',
+    borderWidth: 3,
+    marginBottom: 10,
+    borderRadius: 25,
+    padding: 20
+  },
+
+  messagesProfileIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    marginRight: 10,
+  },
+
+  incomingGroup: {
+    alignItems: 'flex-start',
+  },
+
+  outgoingGroup: {
+    alignItems: 'flex-end',
+  },
+
+  incomingMessage: {
+    borderWidth: 1,
+    borderColor: '#514F56',
+    borderRadius: 25,
+    minHeight: 50,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+  },
+
+  outgoingMessage: {
+    borderWidth: 1,
+    backgroundColor: '#3c5a14',
+    borderRadius: 25,
+    minHeight: 50,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+  },
+
+  messageTimestamp: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#666',
+    alignItems: 'flex-start',
+  },
+
 });

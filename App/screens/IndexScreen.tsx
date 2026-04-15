@@ -46,8 +46,9 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   card: {
+    height: 500,
     width: '100%',
-    maxWidth: 420,
+    maxWidth: 520,
     backgroundColor: '#fff',
     borderRadius: 20,
     padding: 24,
@@ -56,13 +57,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 16,
     elevation: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   profileImage: {
     width: 200,
     height: 200,
     borderRadius: 60,
     marginBottom: 16,
-    
   },
   profileImageOuterDiv: {
     justifyContent: 'center',
