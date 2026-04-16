@@ -6,9 +6,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  TextInput
 } from 'react-native';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
+
+
 
 export default function MessagingScreen() 
 {
@@ -90,6 +93,10 @@ export default function MessagingScreen()
           </View>
         </View>
 
+        <View style={{ marginBottom: 20 }}>
+          <TextInput style={styles.messageTextInput}></TextInput>
+        </View>
+
         <TouchableOpacity
           style={styles.button}
           onPress={handleAddTestEntry}
@@ -116,7 +123,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   card: {
-    height: 1000,
+    height: 700,
     width: '100%',
     maxWidth: 1000,
     backgroundColor: '#fff',
@@ -176,7 +183,7 @@ const styles = StyleSheet.create({
   },
 
   messagesOuterContainer: {
-    minHeight: 600,
+    minHeight: 400,
     minWidth: 100,
     borderColor: '#000',
     borderWidth: 3,
@@ -223,6 +230,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     alignItems: 'flex-start',
+  },
+
+  messageTextInput: {
+    borderWidth: 1,
+    borderColor: '#000',
+    borderRadius: 15,
+    minHeight: 50,
+    paddingHorizontal: 20,
+    fontSize: 15,
   },
 
 });
