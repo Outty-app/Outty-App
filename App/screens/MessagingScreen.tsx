@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Image } from 'react-native';
 import {
   View,
@@ -8,41 +8,67 @@ import {
   Alert,
   TextInput
 } from 'react-native';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+
+import {
+  collection, addDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+  onSnapshot,
+  setDoc,
+  doc
+} from 'firebase/firestore';
+
 import { db } from '../firebaseConfig';
 
+type Message = {
+  id: string;
+  message?: string;
+  sentAt?: any;
+};
 
-
-export default function MessagingScreen() 
-{
+export default function MessagingScreen() {
   const [loading, setLoading] = useState(false);
+  const [messageInput, setMessageInput] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
 
-  const handleAddTestEntry = async () => 
-  {
-    try 
-    {
+  useEffect(() => {
+    const q = query(
+      collection(db, 'user-message'),
+      orderBy('sentAt', 'asc')
+    );
+
+    const unsubscribe = onSnapshot(q, snapshot => {
+      const messageList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setMessages(messageList);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const saveMessageToDb = async () => {
+    try {
       setLoading(true);
 
-      const customId = 'andre-test-message';
-
-      await setDoc(doc(db, 'andre-messages', customId), 
-      {
-        message: 'Hello from MessagingScreen',
-        createdAt: serverTimestamp(),
+      await addDoc(collection(db, 'user-message'), {
+        message: messageInput,
+        sentAt: serverTimestamp(),
       });
 
-      Alert.alert('Success', `Entry added with ID: ${customId}`);
-    } 
-    catch (error) 
-    {
-      console.error('Error adding document:', error);
-      Alert.alert('Error', 'Could not add entry.');
-    } 
-    finally 
-    {
+      setMessageInput('');
+    } catch (error) {
+      Alert.alert('Error', 'Could not send message');
+    } finally {
       setLoading(false);
     }
   };
+
+
+
 
   return (
     <View style={styles.container}>
@@ -64,47 +90,46 @@ export default function MessagingScreen()
         <View style={styles.divider} />
 
         <View style={styles.messagesOuterContainer}>
-          <View style={{ flexDirection: 'row' }}>
-            <Image
-              source={require('../temp-images/hiker_stock.png')}
-              style={styles.messagesProfileIcon} />
+          {messages.map((item) =>
+          (
+            <View style={{marginBottom: 15}}>
+              <View key={item.id} style={styles.outgoingGroup}>
+                <View style={styles.outgoingMessage}>
+                  <Text style={{ color: '#fff' }}>
+                    {item.message ?? ''}
+                  </Text>
+                </View>
 
-            <View style={styles.incomingGroup}>
-              <View style={styles.incomingMessage}>
-                <Text style={{ color: '#000' }}>
-                  Hi. It is very nice to match with you.
+                <Text style={styles.messageTimestamp}>
+                  {item.sentAt?.toDate
+                    ? item.sentAt.toDate().toLocaleTimeString([], {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                    })
+                    : 'Sending...'}
                 </Text>
               </View>
-
-              <Text style={styles.messageTimestamp}>10:30 AM</Text>
             </View>
-          </View>
 
-          <View>
-            <View style={styles.outgoingGroup}>
-              <View style={styles.outgoingMessage}>
-                <Text style={{ color: '#fff' }}>
-                  Nice to meet you as well. Your profile says you like hiking...
-                </Text>
-              </View>
-
-              <Text style={styles.messageTimestamp}>11:18 AM</Text>
-            </View>
-          </View>
+          ))}
         </View>
 
         <View style={{ marginBottom: 20 }}>
-          <TextInput style={styles.messageTextInput}></TextInput>
+          <TextInput style={styles.messageTextInput}
+            placeholder='Type message here...'
+            value={messageInput}
+            onChangeText={setMessageInput}>
+          </TextInput>
         </View>
 
         <TouchableOpacity
           style={styles.button}
-          onPress={handleAddTestEntry}
+          onPress={saveMessageToDb}
           disabled={loading}
           activeOpacity={0.85}
         >
           <Text style={styles.buttonText}>
-            {loading ? 'Adding...' : 'Add Test Entry'}
+            {loading ? 'Sending...' : 'Send Message'}
           </Text>
         </TouchableOpacity>
       </View>
