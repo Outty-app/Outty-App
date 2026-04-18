@@ -72,15 +72,14 @@ export default function MessagingScreen() {
   };
 
   return (
-
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.backBtn}
+        <TouchableOpacity style={styles.backBtn}
           onPress={() => {
-            navigation.navigate('MatchesScreen');
+            navigation.goBack();
           }}>
           Back
-        </Text>
+        </TouchableOpacity>
 
         <View style={styles.topBar}>
           <View style={styles.profileImageOuterDiv}>
@@ -285,7 +284,8 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     width: 'auto',
     marginBottom: 20,
-    cursor: 'pointer'
+    cursor: 'pointer',
+    alignSelf: 'flex-start'
   },
 
 
