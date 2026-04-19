@@ -1,13 +1,12 @@
-jest.mock('../src/services/profileServices');
-const supertest = require('supertest');
-const app = require('../index'); 
+import supertest from 'supertest';
+import app from '../index.js';
+import {
+  createProfile,
+  getProfile
+} from '../src/services/profileServices.js';
+
+jest.mock('../src/services/profileServices.js');
 const request = supertest(app);
-const { 
-    createProfile, 
-    getProfile, 
-    updateProfile, 
-    deleteProfile 
-} = require('../src/services/profileServices');
 
 describe('Profile API Suite', () => {
     

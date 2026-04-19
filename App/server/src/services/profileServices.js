@@ -1,4 +1,4 @@
-const { db } = require('../../../firebase');
+import { db } from '../../../firebase.js';
 
 /**
  * Creates and stores unique user profile data.
@@ -51,7 +51,7 @@ async function deleteProfile(uid) {
   throw new Error('Profile not found');
 }
 
-module.exports = {
+export {
   createProfile,
   getProfile,
   updateProfile,

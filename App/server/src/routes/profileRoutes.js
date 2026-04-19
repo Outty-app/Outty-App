@@ -1,14 +1,13 @@
 // profileRoutes.tests.js (Consolidated standard for both)
-jest.mock('../src/services/profileServices');
-const supertest = require('supertest');
-const app = require('../index'); 
-const request = supertest(app);
-const { 
+import supertest from 'supertest';
+import app from '../../index.js';
+import {
   createProfile, 
-  getProfile, 
-  updateProfile, 
-  deleteProfile 
-} = require('../src/services/profileServices');
+  getProfile
+} from '../services/profileServices.js';
+
+jest.mock('../services/profileServices.js');
+const request = supertest(app);
 
 describe('Profile API Suite', () => {
   beforeEach(() => {
