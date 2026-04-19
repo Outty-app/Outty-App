@@ -1,4 +1,4 @@
-const { db } = require('./firebase');
+const { db } = require('../../../firebase');
 
 //async funcion to create and store unique user profile data
 async function createProfile (uid, profileData){
