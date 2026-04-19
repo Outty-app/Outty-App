@@ -1,56 +1,43 @@
-const express = require('express');
-const router = express.Router();
-const { createProfile, getProfile, updateProfile, deleteProfile } = require('../services/profileServices')
+jest.mock('../src/services/profileServices');
+const supertest = require('supertest');
+const app = require('../index'); 
+const request = supertest(app);
+const { 
+    createProfile, 
+    getProfile, 
+    updateProfile, 
+    deleteProfile 
+} = require('../src/services/profileServices');
 
+describe('Profile API Suite', () => {
+    
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
 
-//using /:uid as dynamic parameter to create profile
-router.post('/:uid', async (req, res) =>{
-    if (!req.body || Object.keys(req.body).length === 0) {
-            return res.status(400).json({ error: 'Request body is empty' });
-    }
-    try{
-        const profile = await createProfile(req.params.uid, req.body);
-        res.status(201).json(profile);
-    }catch (error) {
-        console.log(error);
-        res.status(409).json({error: error.message});
-    }
-})
+    // TEST 1: Creation
+    describe('POST /api/profile/:uid', () => {
+        it('should return a 201 after successful profile creation', async () => {
+            createProfile.mockResolvedValue('profile created');
+            const res = await request
+                .post('/api/profile/test-user-123')
+                .send({ displayName: 'Test User' });
+            
+            expect(res.status).toBe(201);
+            expect(res.body).toBe('profile created');
+        });
+    });
 
-//using /:uid as dynamic parameter to read profile
-router.get('/:uid', async (req, res) => {
-    try{
-        const profile = await getProfile(req.params.uid);
-        res.status(200).json(profile);
-    }catch (error) {
-        console.log(error);
-        res.status(404).json({error: error.message});
-    }
+    // TEST 2: Retrieval
+    describe('GET /api/profile/:uid', () => {
+        it('should return a 200 if the profile exists', async () => {
+            const mockData = { uid: 'test-user-123', displayName: 'Test User' };
+            getProfile.mockResolvedValue(mockData);
+            
+            const res = await request.get('/api/profile/test-user-123');
+            
+            expect(res.status).toBe(200);
+            expect(res.body).toEqual(mockData);
+        });
+    });
 });
-
-//using /:uid as dynamic parameter to edit profile
-router.patch('/:uid', async (req, res) => {
-    if (!req.body || Object.keys(req.body).length === 0) {
-            return res.status(400).json({ error: 'Request body is empty' });
-    }
-    try{
-        const profile = await updateProfile(req.params.uid, req.body);
-        res.status(200).json(profile);
-    }catch (error) {
-        console.log(error);
-        res.status(404).json({error: error.message});
-    }
-});
-
-//using /:uid as dynamic parameter to delete profile
-router.delete('/:uid', async(req, res) => {
-    try{
-        const profile = await deleteProfile(req.params.uid);
-        res.status(200).json(profile);
-    }catch (error) {
-        console.log(error);
-        res.status(404).json({error: error.message});
-    }
-});
-
-module.exports = router;
