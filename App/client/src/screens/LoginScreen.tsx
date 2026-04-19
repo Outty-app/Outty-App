@@ -54,7 +54,7 @@ export default function LoginScreen({ navigation }: Props) {
       setLoginError('Incorrect email or password.');
       return;
     }
-    alert(`Welcome back, ${found.email}!`);
+    navigation.navigate('MainTabs');
   };
 
   return (
