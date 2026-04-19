@@ -15,20 +15,15 @@ type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Signup'>;
 };
 
-const TOTAL_STEPS = 4;
 const GREEN = '#2D9B6F';
 
 export default function SignupScreen({ navigation }: Props) {
-    const [step, _setStep] = useState(1); // Prefixed unused step logic
-    const [_loading, _setLoading] = useState(false);
-
     // Step 1 fields
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleSignupPress = () => {
-        // Logic will go here
         console.log('Registering:', name, email);
     };
 
@@ -36,7 +31,6 @@ export default function SignupScreen({ navigation }: Props) {
         <KeyboardAvoidingView style={styles.bg} behavior="padding">
             <ScrollView contentContainerStyle={styles.scroll}>
                 <View style={styles.card}>
-                    <Text style={styles.stepIndicator}>Step {step} of {TOTAL_STEPS}</Text>
                     <Text style={styles.title}>Create Account</Text>
 
                     <Text style={styles.label}>Full Name</Text>
@@ -83,7 +77,6 @@ const styles = StyleSheet.create({
     bg: { flex: 1, backgroundColor: '#e8f5f0' },
     scroll: { flexGrow: 1, justifyContent: 'center', padding: 20 },
     card: { backgroundColor: '#fff', borderRadius: 20, padding: 25, elevation: 5 },
-    stepIndicator: { color: GREEN, fontWeight: '700', marginBottom: 5 },
     title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
     label: { fontSize: 14, fontWeight: '600', marginBottom: 5, marginTop: 10 },
     input: { backgroundColor: '#f5f5f5', borderRadius: 10, padding: 12, fontSize: 16 },

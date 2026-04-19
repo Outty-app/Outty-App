@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'; // Added
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   View,
   Text,
@@ -21,16 +20,16 @@ import {
 } from 'firebase/firestore';
 
 import { db } from '../firebase';
-import { RootStackParamList } from '../../types'; // Added
+import { RootStackParamList } from '../../types';
 
 type Message = {
   id: string;
   message?: string;
-  sentAt?: { seconds: number; nanoseconds: number } | Date | null; // Fixed any
+  sentAt?: { seconds: number; nanoseconds: number } | Date | null;
 };
 
 export default function MessagingScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>(); // Fixed any
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [loading, setLoading] = useState(false);
   const [messageInput, setMessageInput] = useState('');
@@ -64,7 +63,7 @@ export default function MessagingScreen() {
         sentAt: serverTimestamp(),
       });
       setMessageInput('');
-    } catch { // Removed unused error variable
+    } catch {
       Alert.alert('Error', 'Failed to send message.');
     } finally {
       setLoading(false);

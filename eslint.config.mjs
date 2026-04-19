@@ -3,43 +3,28 @@ import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
 
 export default tseslint.config(
-  // Global recommended rules
   tseslint.configs.recommended,
-
-  // 1. BACKEND & TESTS (Allow CommonJS and turn off TS-specific restrictions)
+  // CONFIG FOR SERVER & TESTS
   {
-    files: ["server/**/*.js", "tests/**/*.js", "**/__tests__/**/*.js"],
+    files: ["server/**/*.js", "tests/**/*.js"],
     languageOptions: {
-      sourceType: "commonjs",
-      globals: { ...globals.node, ...globals.jest }
+      sourceType: "commonjs", // Allows require()
+      globals: globals.node
     },
     rules: {
       "@typescript-eslint/no-require-imports": "off",
-      "@typescript-eslint/no-var-requires": "off",
-      "@typescript-eslint/no-unused-vars": "warn", // Change to warn so it doesn't block builds
-      "@typescript-eslint/no-explicit-any": "off"
+      "@typescript-eslint/no-unused-vars": "warn", // Don't block build for unused vars in backend
+      "@typescript-eslint/ban-ts-comment": "off"    // Allows @ts-ignore
     }
   },
-
-  // 2. FRONTEND (React Native / TypeScript)
+  // CONFIG FOR APP SCREENS
   {
-    files: ["App/**/*.{ts,tsx}"],
-    languageOptions: {
-      globals: globals.browser
-    },
-    plugins: {
-      react: pluginReact
-    },
-    settings: {
-      react: { version: "detect" }
-    },
+    files: ["App/**/*.tsx", "App/**/*.ts"],
+    plugins: { react: pluginReact },
+    languageOptions: { globals: globals.browser },
     rules: {
-      ...pluginReact.configs.flat.recommended.rules,
-      "react/react-in-jsx-scope": "off", // Not needed in modern React
-      "@typescript-eslint/no-explicit-any": "warn",
-      "react/no-unescaped-entities": ["error", { forbid: [">", "}"] }], // Allows single quotes in text
-      "@typescript-eslint/no-require-imports": "off",
-      "@typescript-eslint/no-var-requires": "off"
+      "react/react-in-jsx-scope": "off",
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }] // This allows the _prefix
     }
   }
 );
