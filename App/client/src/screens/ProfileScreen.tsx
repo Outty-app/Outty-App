@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../../types';
+import { RootStackParamList } from '../../../../types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const GREEN = '#2D9B6F';
@@ -62,26 +62,7 @@ export default function ProfileScreen() {
   if (loading) {
       return<Text>Loading...</Text>;
     }
-  /*
-  const handleDelete = () => {
-    Alert.alert(
-      'Delete Profile',
-      'Are you sure? ',
-      [
-        {text: 'Cancel'},
-        {text: 'Delete', onPress: () => {
-          fetch(`http://localhost:3000/api/profile/${uid}`)
-          method: DELETE;
-          .then(res => res.json())
-          .then(data => {
-            delete(profile.data)
-          })
-        }}
-      ]
-    )
-    
-  }
-    */
+
   return (
     <ScrollView 
       style={styles.container}
