@@ -16,7 +16,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
 // @ts-expect-error - firebase module lacks type declarations
-import { auth } from '../../firebase';
+import { auth } from '../firebase';
 import { RootStackParamList } from '../../../../types';
 
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
