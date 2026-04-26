@@ -9,18 +9,20 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
-  Alert
+  Alert,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 // @ts-expect-error - firebase module lacks type declarations
 import { auth } from '../firebase';
 import { RootStackParamList } from '../../../../types';
 
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
+GoogleSignin.configure({
+  webClientId: '349245259412-14cvrtnqbk2nb0fnivqp6qm64l45e4l9.apps.googleusercontent.com',
+});
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
@@ -76,10 +78,10 @@ export default function LoginScreen({ navigation }: Props) {
     setPasswordError(pErr);
     setLoginError('');
     if (eErr || pErr) return;
+
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
-      navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+      await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
     } catch (err: unknown) {
       const code = (err as { code?: string }).code ?? '';
       if (
@@ -98,8 +100,6 @@ export default function LoginScreen({ navigation }: Props) {
     }
   }
 
-  GoogleSignin.configure({ webClientId: '349245259412-14cvrtnqbk2nb0fnivqp6qm64l45e4l9.apps.googleusercontent.com' });
-
   async function handleGooglePress() {
     try {
       await GoogleSignin.hasPlayServices();
@@ -111,14 +111,13 @@ export default function LoginScreen({ navigation }: Props) {
       }
       const credential = GoogleAuthProvider.credential(idToken);
       await signInWithCredential(auth, credential);
-      navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
     } catch {
       Alert.alert('Error', 'Google Sign-In failed. Please try again.');
     }
   }
 
   function handleSignupPress() {
-    navigation.reset({ index: 0, routes: [{ name: 'Signup' }] });
+    navigation.navigate('Signup');
   }
 
   return (
@@ -166,11 +165,7 @@ export default function LoginScreen({ navigation }: Props) {
             activeOpacity={0.85}
             disabled={loading}
           >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.loginBtnText}>Log In</Text>
-            )}
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginBtnText}>Log In</Text>}
           </TouchableOpacity>
 
           <View style={styles.dividerRow}>
@@ -179,11 +174,7 @@ export default function LoginScreen({ navigation }: Props) {
             <View style={styles.dividerLine} />
           </View>
 
-          <TouchableOpacity
-            style={styles.socialBtn}
-            onPress={handleGooglePress}
-            activeOpacity={0.85}
-          >
+          <TouchableOpacity style={styles.socialBtn} onPress={handleGooglePress} activeOpacity={0.85}>
             <GoogleIcon />
             <Text style={styles.socialBtnText}>Sign in with Google</Text>
           </TouchableOpacity>
