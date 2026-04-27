@@ -83,7 +83,8 @@ export default function SignupScreen({ navigation }: Props) {
                 displayName: name.trim(),
             });
 
-            await setDoc(doc(db, 'users', uid), {
+
+            await setDoc(doc(db, 'profiles', uid), {
                 uid,
                 name: name.trim(),
                 email: email.trim().toLowerCase(),

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../../../types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AuthProvider, useAuth } from '../../src/context/AuthContext';
 
 const GREEN = '#2D9B6F';
 const BACKGROUND = '#f8f9fa';
@@ -30,8 +31,9 @@ const ConnectedAccountSection = ({ username, onDisconnect }: { username: string;
 
 export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  // Hardcoded uid for now - will be replaced with auth context later
-  const uid = 'user123';
+  
+  const { firebaseUser, userProfile } = useAuth();
+
   // State to store profile data from the backend
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profile, setProfile] = useState<any>(null);
@@ -45,7 +47,7 @@ export default function ProfileScreen() {
   const [editInterests, setEditInterests] = useState('');
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/profile/${uid}`)
+    fetch(`http://localhost:3000/api/profile/${userProfile?.uid}`)
         .then(res => res.json())
         .then(data => {
           console.log('Profile data:', data);
@@ -77,7 +79,7 @@ export default function ProfileScreen() {
   };
 
   const handleSave = () => {
-    fetch(`http://localhost:3000/api/profile/${uid}`, {
+    fetch(`http://localhost:3000/api/profile/${userProfile?.uid}`, {
       method: 'PATCH',
       headers: {
             'Content-Type': 'application/json'
@@ -90,7 +92,7 @@ export default function ProfileScreen() {
       })
     })
     .then(() => {
-      return fetch(`http://localhost:3000/api/profile/${uid}`)
+      return fetch(`http://localhost:3000/api/profile/${userProfile?.uid}`)
         .then(res => res.json())
         .then(data => {
           console.log('Updated Profile', data)
@@ -103,7 +105,7 @@ export default function ProfileScreen() {
   }
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete your profile?')) {
-        fetch(`http://localhost:3000/api/profile/${uid}`, {
+        fetch(`http://localhost:3000/api/profile/${userProfile?.uid}`, {
             method: 'DELETE'
         })
         .then(res => res.json())

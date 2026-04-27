@@ -17,7 +17,8 @@ import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } 
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 // @ts-expect-error - firebase module lacks type declarations
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { RootStackParamList } from '../../../../types';
 
 GoogleSignin.configure({
@@ -72,33 +73,55 @@ export default function LoginScreen({ navigation }: Props) {
   }
 
   async function handleLogin() {
-    const eErr = validateEmail(email);
-    const pErr = validatePassword(password);
-    setEmailError(eErr);
-    setPasswordError(pErr);
-    setLoginError('');
-    if (eErr || pErr) return;
+  const eErr = validateEmail(email);
+  const pErr = validatePassword(password);
+  setEmailError(eErr);
+  setPasswordError(pErr);
+  setLoginError('');
+  if (eErr || pErr) return;
 
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
-    } catch (err: unknown) {
-      const code = (err as { code?: string }).code ?? '';
-      if (
-        code === 'auth/user-not-found' ||
-        code === 'auth/wrong-password' ||
-        code === 'auth/invalid-credential'
-      ) {
-        setLoginError('Incorrect email or password.');
-      } else if (code === 'auth/too-many-requests') {
-        setLoginError('Too many attempts. Please try again later.');
-      } else {
-        setLoginError('Something went wrong. Please try again.');
-      }
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email.trim().toLowerCase(),
+      password
+    );
+
+    const user = userCredential.user;
+
+    const userRef = doc(db, 'profiles', user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        uid: user.uid,
+        name: user.displayName?.trim() || '',
+        email: user.email?.trim().toLowerCase() || email.trim().toLowerCase(),
+        provider: 'email',
+        role: 'user',
+      });
     }
+
+    // navigation to main app is handled by AuthFlow (onAuthStateChanged),
+    // so you don't need navigation.reset here.
+  } catch (err: unknown) {
+    const code = (err as { code?: string }).code ?? '';
+    if (
+      code === 'auth/user-not-found' ||
+      code === 'auth/wrong-password' ||
+      code === 'auth/invalid-credential'
+    ) {
+      setLoginError('Incorrect email or password.');
+    } else if (code === 'auth/too-many-requests') {
+      setLoginError('Too many attempts. Please try again later.');
+    } else {
+      setLoginError('Something went wrong. Please try again.');
+    }
+  } finally {
+    setLoading(false);
   }
+}
 
   async function handleGooglePress() {
     try {
