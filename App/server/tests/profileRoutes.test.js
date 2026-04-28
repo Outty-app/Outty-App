@@ -13,7 +13,7 @@ jest.mock('../src/services/firebase', () => ({
     bucket: {}
 }));
 
-// 1. Mocking the service module
+
 jest.mock('../src/services/profileServices');
 
 const supertest = require('supertest');
