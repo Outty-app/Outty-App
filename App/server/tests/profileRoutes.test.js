@@ -1,13 +1,16 @@
-jest.mock('firebase-admin', () => ({
-  initializeApp: jest.fn(),
-  credential: {
-    cert: jest.fn(),
-  },
-  firestore: jest.fn(() => ({
-    collection: jest.fn().mockReturnThis(),
-    doc: jest.fn().mockReturnThis(),
-    // add any other firestore methods you use here
-  })),
+jest.mock('../src/services/firebase', () => ({
+    admin: {
+        initializeApp: jest.fn(),
+        credential: { cert: jest.fn() },
+        storage: jest.fn(() => ({
+            bucket: jest.fn(() => ({ /* mock bucket methods if needed */ }))
+        }))
+    },
+    db: {
+        collection: jest.fn().mockReturnThis(),
+        doc: jest.fn().mockReturnThis(),
+    },
+    bucket: {}
 }));
 
 // 1. Mocking the service module
