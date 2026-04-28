@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../../types';
-import { AuthProvider, useAuth } from '../../src/context/AuthContext';
+import { useAuth } from '../../src/context/AuthContext';
 
 const GREEN = '#2D9B6F';
 

@@ -32,7 +32,7 @@ const ConnectedAccountSection = ({ username, onDisconnect }: { username: string;
 export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const { firebaseUser, userProfile, logout } = useAuth();
+  const { userProfile, logout } = useAuth();
 
   // State to store profile data from the backend
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,30 +59,6 @@ export default function ProfileScreen() {
       });
   }, []
   );
-
-  // const handleLogout = () => {
-  //   Alert.alert(
-  //     'Log Out',
-  //     'Are you sure you want to log out?',
-  //     [
-  //       { text: 'Cancel', style: 'cancel' },
-  //       {
-  //         text: 'Log Out',
-  //         style: 'destructive',
-  //         onPress: async () => {
-  //           try {
-  //             console.log('Logout pressed');
-  //             console.log('Current user before logout:', firebaseUser?.uid);
-  //             await logout();
-  //             console.log('Logout finished');
-  //           } catch (error) {
-  //             console.log('Logout error:', error);
-  //           }
-  //         },
-  //       },
-  //     ]
-  //   );
-  // };
 
   const handleLogout = async () => {
     alert('handleLogout fired');
