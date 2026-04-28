@@ -1,54 +1,114 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
+// DiscoverScreen.tsx
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import { useAuth } from '../../src/context/AuthContext';
+import { loadInitialQueue } from '../services/discoveryServices';
 
 const GREEN = '#2D9B6F';
 
 export default function DiscoverScreen() {
+  const [profilesQueue, setProfilesQueue] = useState<UserProfile[]>([]);
+
+  const { userProfile } = useAuth();
+
+  useEffect(() => {
+    async function initQueue() {
+      try {
+        const currentUid = userProfile?.uid;
+        if (!currentUid) return;
+
+        console.log('andre UID is ' + currentUid);
+
+        const profiles = await loadInitialQueue(currentUid);
+
+        console.log(profiles);
+        setProfilesQueue(profiles);
+      }
+      catch (error) {
+        console.error('Failed to initialize queue:', error);
+      }
+    }
+
+    initQueue();
+  }, [userProfile]);
+
+  type UserProfile = {
+    id?: string;
+    uid?: string;
+    name?: string;
+    age?: number;
+    city?: string;
+    state?: string;
+    bio?: string;
+    username?: string;
+    photoURL?: string;
+    interests?: string[];
+    skillLevel?: string;
+    attitude?: string;
+    maxRange?: string;
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <View style={styles.card}>
-          {/* Main Image & Overlay */}
-          <View style={styles.imageWrapper}>
-            <Image 
-              source={{ uri: 'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?q=80&w=1000&auto=format&fit=crop' }} 
-              style={styles.profileImg} 
-            />
-            <View style={styles.overlay}>
-              <Text style={styles.name}>Jordan Peak, 30</Text>
-              <Text style={styles.location}>📍 Boulder, CO</Text>
-              <View style={styles.tagRow}>
-                {['hiking', 'mountaineering', 'backpacking'].map((t) => (
-                  <View key={t} style={styles.tag}>
-                    <Text style={styles.tagText}>{t}</Text>
+        {profilesQueue.length === 0 ? (
+          <Text style={{ textAlign: 'center', marginTop: 40 }}>Loading profiles...</Text>
+        ) : (
+          profilesQueue.map((profile) => (
+            <View key={profile.id} style={styles.card}>
+              <View style={styles.imageWrapper}>
+                <Image
+                  source={{
+                    uri:
+                      profile.photoURL ||
+                      'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?q=80&w=1000&auto=format&fit=crop',
+                  }}
+                  style={styles.profileImg}
+                />
+                <View style={styles.overlay}>
+                  <Text style={styles.name}>
+                    {profile.name || 'Unknown User'}
+                    {profile.age ? `, ${profile.age}` : ''}
+                  </Text>
+                  <Text style={styles.location}>
+                    📍 {profile.city || 'Unknown City'}
+                    {profile.state ? `, ${profile.state}` : ''}
+                  </Text>
+
+                  <View style={styles.tagRow}>
+                    {(profile.interests || []).map((tag) => (
+                      <View key={tag} style={styles.tag}>
+                        <Text style={styles.tagText}>{tag}</Text>
+                      </View>
+                    ))}
                   </View>
-                ))}
+
+                  <Text style={styles.handle}>@{profile.username || 'unknown'}</Text>
+                </View>
               </View>
-              <Text style={styles.handle}>@jordanpeak</Text>
-            </View>
-          </View>
 
-          {/* Bio & Stats */}
-          <View style={styles.content}>
-            <Text style={styles.bio}>Chasing summits and sunrises. Let's conquer the Rockies together! 🏔</Text>
-            
-            <View style={styles.statsRow}>
-              <Stat label="Skill Level" value="Advanced" />
-              <Stat label="Attitude" value="Intense" />
-              <Stat label="Max Range" value="75 mi" />
-            </View>
+              <View style={styles.content}>
+                <Text style={styles.bio}>
+                  {profile.bio || 'No bio added yet.'}
+                </Text>
 
-            <View style={styles.gallery}>
-               <View style={styles.galleryPlaceholder} />
-               <View style={styles.galleryPlaceholder} />
+                <View style={styles.statsRow}>
+                  <Stat label="Skill Level" value={profile.skillLevel || '—'} />
+                  <Stat label="Attitude" value={profile.attitude || '—'} />
+                  <Stat label="Max Range" value={profile.maxRange || '—'} />
+                </View>
+
+                <View style={styles.gallery}>
+                  <View style={styles.galleryPlaceholder} />
+                  <View style={styles.galleryPlaceholder} />
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
+          ))
+        )}
       </ScrollView>
 
-      {/* Footer Actions */}
       <View style={styles.actions}>
         <TouchableOpacity style={[styles.actionBtn, styles.btnNo]}>
           <Ionicons name="close" size={32} color="#e74c3c" />
@@ -67,6 +127,8 @@ const Stat = ({ label, value }: { label: string; value: string }) => (
     <Text style={styles.statValue}>{value}</Text>
   </View>
 );
+
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
