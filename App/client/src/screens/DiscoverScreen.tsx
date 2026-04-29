@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../src/context/AuthContext';
-import { loadInitialQueue } from '../services/discoveryServices';
+import { loadInitialQueue, saveInteraction } from '../services/discoveryServices';
 
 const GREEN = '#2D9B6F';
 
 export default function DiscoverScreen() {
   const [profilesQueue, setProfilesQueue] = useState<UserProfile[]>([]);
-
+  const activeProfile = profilesQueue[0];
   const { userProfile } = useAuth();
 
   useEffect(() => {
@@ -33,6 +33,19 @@ export default function DiscoverScreen() {
     initQueue();
   }, [userProfile]);
 
+  async function handleInteraction(type: 'like' | 'pass' | 'block') {
+    try {
+      if (!activeProfile || !userProfile?.uid || !activeProfile.uid) return;
+
+      await saveInteraction(userProfile.uid, activeProfile.uid, type);
+
+      setProfilesQueue((prevQueue) => prevQueue.slice(1));
+    }
+    catch (error) {
+      console.error('Failed to save interaction:', error);
+    }
+  }
+
   type UserProfile = {
     id?: string;
     uid?: string;
@@ -51,7 +64,7 @@ export default function DiscoverScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      {/* <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {profilesQueue.length === 0 ? (
           <Text style={{ textAlign: 'center', marginTop: 40 }}>Loading profiles...</Text>
         ) : (
@@ -107,13 +120,85 @@ export default function DiscoverScreen() {
             </View>
           ))
         )}
+      </ScrollView> */}
+
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {!activeProfile ? (
+          <Text style={{ textAlign: 'center', marginTop: 40 }}>No more profiles.</Text>
+        ) : (
+          <View key={activeProfile.id} style={styles.card}>
+            <View style={styles.imageWrapper}>
+              <Image
+                source={{
+                  uri:
+                    activeProfile.photoURL ||
+                    'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?q=80&w=1000&auto=format&fit=crop',
+                }}
+                style={styles.profileImg}
+              />
+              <View style={styles.overlay}>
+                <Text style={styles.name}>
+                  {activeProfile.name || 'Unknown User'}
+                  {activeProfile.age ? `, ${activeProfile.age}` : ''}
+                </Text>
+                <Text style={styles.location}>
+                  📍 {activeProfile.city || 'Unknown City'}
+                  {activeProfile.state ? `, ${activeProfile.state}` : ''}
+                </Text>
+
+                <View style={styles.tagRow}>
+                  {(activeProfile.interests || []).map((tag) => (
+                    <View key={tag} style={styles.tag}>
+                      <Text style={styles.tagText}>{tag}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                <Text style={styles.handle}>@{activeProfile.username || 'unknown'}</Text>
+              </View>
+            </View>
+
+            <View style={styles.content}>
+              <Text style={styles.bio}>
+                {activeProfile.bio || 'No bio added yet.'}
+              </Text>
+
+              <View style={styles.statsRow}>
+                <Stat label="Skill Level" value={activeProfile.skillLevel || '—'} />
+                <Stat label="Attitude" value={activeProfile.attitude || '—'} />
+                <Stat label="Max Range" value={activeProfile.maxRange || '—'} />
+              </View>
+
+              <View style={styles.gallery}>
+                <View style={styles.galleryPlaceholder} />
+                <View style={styles.galleryPlaceholder} />
+              </View>
+            </View>
+          </View>
+        )}
       </ScrollView>
 
-      <View style={styles.actions}>
+      {/* <View style={styles.actions}>
         <TouchableOpacity style={[styles.actionBtn, styles.btnNo]}>
           <Ionicons name="close" size={32} color="#e74c3c" />
         </TouchableOpacity>
         <TouchableOpacity style={[styles.actionBtn, styles.btnYes]}>
+          <Ionicons name="heart" size={32} color="#fff" />
+        </TouchableOpacity>
+      </View> */}
+
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={[styles.actionBtn, styles.btnNo]}
+          onPress={() => handleInteraction('pass')}
+        >
+          <Ionicons name="close" size={32} color="#e74c3c" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.actionBtn, styles.btnYes]}
+          onPress={() => handleInteraction('like')}
+        >
           <Ionicons name="heart" size={32} color="#fff" />
         </TouchableOpacity>
       </View>

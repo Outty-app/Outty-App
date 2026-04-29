@@ -1,5 +1,5 @@
 const { db } = require('../firebase');
-import { collection, query, where, limit, getDocs } from 'firebase/firestore';
+import { collection, query, where, limit, getDocs, setDoc, serverTimestamp, doc } from 'firebase/firestore';
 
 async function fetchIdsOfInteractedWithUsers(currentUserUid) {
     // TODO
@@ -30,4 +30,28 @@ async function loadInitialQueue(currentUserUid) {
     }
 }
 
-module.exports = { loadInitialQueue, matchUsers };
+async function saveInteraction(currentUserUid, targetMatchUid, typeOfInteraction) {
+    console.log('Current user ID = ' + currentUserUid);
+    console.log('Target user ID = ' + targetMatchUid);
+    console.log('Interaction = ' + typeOfInteraction);
+
+    try {
+        const interactionDocId = `${currentUserUid}_${targetMatchUid}`;
+
+        const interactionRef = doc(db, 'interactions', interactionDocId);
+
+        await setDoc(interactionRef, {
+            fromUid: currentUserUid,
+            toUid: targetMatchUid,
+            type: typeOfInteraction, // 'like' | 'pass' | 'block'
+            createdAt: serverTimestamp(),
+        });
+
+        return interactionDocId;
+    } catch (error) {
+        console.error('Error saving interaction:', error.message);
+        throw error;
+    }
+}
+
+module.exports = { loadInitialQueue, matchUsers, saveInteraction };
