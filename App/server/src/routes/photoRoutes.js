@@ -1,31 +1,37 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const { uploadPhoto, getPhoto } = require('../services/photoService');
 
-const { savePhoto, getPhoto } = require('../services/photoService');
+// Store file in memory as buffer
+const upload = multer({ storage: multer.memoryStorage() });
 
-// Upload photo (save URL)
-router.post('/:uid', async (req, res) => {
+// Upload photo
+router.post('/:uid', upload.single('photo'), async (req, res) => {
   try {
-    const { photoUrl } = req.body;
+      if (!req.file) {
+          return res.status(400).json({ error: 'No file uploaded' });
+      }
 
-    if (!photoUrl) {
-      return res.status(400).json({ error: 'Photo URL is required' });
-    }
+      const photoUrl = await uploadPhoto(
+          req.params.uid,
+          req.file.buffer,
+          req.file.mimetype
+      );
 
-    const result = await savePhoto(req.params.uid, photoUrl);
-    res.status(200).json(result);
+      res.status(201).json({ message: 'Photo uploaded successfully', photoUrl });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message });
   }
 });
 
-// Get photo
+// Get photos
 router.get('/:uid', async (req, res) => {
   try {
-    const photo = await getPhoto(req.params.uid);
-    res.status(200).json({ photo });
+      const photos = await getPhoto(req.params.uid);
+      res.status(200).json({ photos });
   } catch (error) {
-    res.status(404).json({ error: error.message });
+      res.status(404).json({ error: error.message });
   }
 });
 
