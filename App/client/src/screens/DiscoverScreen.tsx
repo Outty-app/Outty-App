@@ -132,8 +132,28 @@ const Stat = ({ label, value }: { label: string; value: string }) => (
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  scroll: { padding: 16, paddingBottom: 100 },
-  card: { backgroundColor: '#fff', borderRadius: 20, overflow: 'hidden', elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10 },
+
+  scroll: {
+    padding: 16,
+    paddingBottom: 100,
+    alignItems: 'center',
+  },
+
+  card: {
+    width: '30%',
+    minWidth: 340,
+    maxWidth: 420,
+    alignSelf: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    overflow: 'hidden',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    marginBottom: 24,
+  },
+
   imageWrapper: { height: 400, position: 'relative' },
   profileImg: { width: '100%', height: '100%' },
   overlay: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, backgroundColor: 'rgba(0,0,0,0.3)' },
@@ -146,11 +166,11 @@ const styles = StyleSheet.create({
   content: { padding: 20 },
   bio: { fontSize: 15, color: '#444', lineHeight: 22, marginBottom: 20 },
   statsRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  statBox: { alignItems: 'center' },
+  statBox: { alignItems: 'center', flex: 1 },
   statLabel: { fontSize: 12, color: '#888', marginBottom: 2 },
   statValue: { fontSize: 14, fontWeight: '600', color: '#333' },
-  gallery: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },
-  galleryPlaceholder: { width: '48%', height: 100, backgroundColor: '#eee', borderRadius: 12 },
+  gallery: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, gap: 12 },
+  galleryPlaceholder: { flex: 1, height: 100, backgroundColor: '#eee', borderRadius: 12 },
   actions: { position: 'absolute', bottom: 30, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 20 },
   actionBtn: { width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center', elevation: 4, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 5 },
   btnNo: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#eee' },
