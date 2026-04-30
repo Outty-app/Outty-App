@@ -1,29 +1,44 @@
-const { db } = require('./firebase'); // uses your existing firebase config
-
+const { db, bucket, admin } = require('./firebase'); // uses your existing firebase config
 // Save photo URL to user profile
 const savePhoto = async (uid, photoUrl) => {
-  const userRef = db.collection('users').doc(uid);
-
-  await userRef.set(
+  const userRef = db.collection('profiles').doc(uid);
+  await userRef.update ( 
     {
-      photo: photoUrl,
-    },
-    { merge: true }
-  );
+      photos: admin.firestore.FieldValue.arrayUnion(photoUrl)
+    }
+  )
 
-  return { message: 'Photo saved successfully', photo: photoUrl };
+  return { message: 'Photos saved successfully', photos: photoUrl };
 };
 
 // Get photo from profile
 const getPhoto = async (uid) => {
-  const userRef = db.collection('users').doc(uid);
+  const userRef = db.collection('profiles').doc(uid);
   const doc = await userRef.get();
 
   if (!doc.exists) {
     throw new Error('User not found');
   }
 
-  return doc.data().photo;
+  return doc.data().photos;
 };
 
-module.exports = { savePhoto, getPhoto };
+const uploadPhoto = async (uid, fileBuffer, mimeType) => {
+  const fileName = `photos/${uid}/${Date.now()}`;
+  const file = bucket.file(fileName);
+
+  await file.save(fileBuffer, {
+      metadata: { contentType: mimeType }
+  });
+
+  await file.makePublic();
+
+  const photoUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+  
+  // Save URL to profile
+  await savePhoto(uid, photoUrl);
+  
+  return photoUrl;
+};
+
+module.exports = { savePhoto, getPhoto, uploadPhoto };
