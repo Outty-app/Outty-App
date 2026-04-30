@@ -1,4 +1,4 @@
-const db = require('./firebase'); // uses your existing firebase config
+const { db } = require('./firebase'); // uses your existing firebase config
 
 // Save photo URL to user profile
 const savePhoto = async (uid, photoUrl) => {
