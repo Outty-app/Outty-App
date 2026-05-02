@@ -1,4 +1,4 @@
-// @ts-expect-error - firebase module lacks type declaration
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { db } = require('../firebase');
 import { collection, query, where, limit, getDocs, setDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
 
