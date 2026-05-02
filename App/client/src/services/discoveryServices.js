@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { db } = require('../firebase');
 import { collection, query, where, limit, getDocs, setDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
 
