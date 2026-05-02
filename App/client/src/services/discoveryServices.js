@@ -1,6 +1,7 @@
 const { db } = ('../firebase');
 import { collection, query, where, limit, getDocs, setDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
 
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function matchUsers(fromUid, toUid) {
     const docRef = db.collection('interactions').doc(`${fromUid}_${toUid}`);
     // const doc = await docRef.get();
