@@ -34,7 +34,7 @@ export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const { userProfile, logout } = useAuth();
-
+  
   // State to store profile data from the backend
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profile, setProfile] = useState<any>(null);
@@ -46,6 +46,8 @@ export default function ProfileScreen() {
   const [editBio, setEditBio] = useState('');
   const [editLocation, setEditLocation] = useState('');
   const [editInterests, setEditInterests] = useState('');
+  const [editSkillLevel, setEditSkillLevel] = useState('');
+  const [editAttitude, setEditAttitude] = useState('');
 
   useEffect(() => {
     if (!userProfile?.uid) return;
@@ -61,6 +63,11 @@ export default function ProfileScreen() {
       });
   }, [userProfile?.uid]);
 
+  const refreshProfile = () => {
+    fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/profile/${userProfile?.uid}`)
+        .then(res => res.json())
+        .then(data => setProfile(data));
+  };
   const handleLogout = async () => {
     alert('handleLogout fired');
     try {
@@ -81,6 +88,8 @@ export default function ProfileScreen() {
     setEditLocation(profile?.location ?? '');
     setEditInterests(profile?.interests?.join(', ') ?? '');
     setModalVisible(true);
+    setEditSkillLevel(profile?.skillLevel ?? '');
+    setEditAttitude(profile?.attitude ?? '');
   };
 
   const handleSave = () => {
@@ -93,7 +102,9 @@ export default function ProfileScreen() {
         ...(editName && { name: editName }),
         ...(editBio && { bio: editBio }),
         ...(editLocation && { location: editLocation }),
-        ...(editInterests && { interests: editInterests.split(',').map(i => i.trim()) })
+        ...(editInterests && { interests: editInterests.split(',').map(i => i.trim()) }),
+        ...(editSkillLevel && { skillLevel: editSkillLevel }),
+        ...(editAttitude && { attitude: editAttitude }),
       })
     })
       .then(() => {
@@ -154,7 +165,7 @@ export default function ProfileScreen() {
             style={styles.profileImage}
           />
         </View>
-        <PhotoManager />
+        <PhotoManager onPhotoChange={refreshProfile}/>
         <View style={styles.infoSection}>
           <Text style={styles.label}>Name</Text>
           <Text style={styles.value}>{profile?.name}</Text>
@@ -237,7 +248,12 @@ export default function ProfileScreen() {
 
             <Text style={styles.label}>Interests (comma separated)</Text>
             <TextInput style={styles.input} value={editInterests} onChangeText={setEditInterests} />
+            
+            <Text style={styles.label}>Skill Level</Text>
+            <TextInput style={styles.input} value={editSkillLevel} onChangeText={setEditSkillLevel} />
 
+            <Text style={styles.label}>Attitude</Text>
+            <TextInput style={styles.input} value={editAttitude} onChangeText={setEditAttitude} />
             <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
               <Text style={styles.saveBtnText}>Save</Text>
             </TouchableOpacity>

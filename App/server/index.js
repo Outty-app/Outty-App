@@ -3,7 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:8081', 'https://outty-app-yyq6.vercel.app/']
+}));
 app.use(express.json());
 
 // @ts-ignore
