@@ -1,6 +1,6 @@
 # Roan
 
-Implemented login screen with email/password authentication using Firebase Auth
+Refined login screen with email/password authentication using Firebase Auth
 Built multi-step signup flow with form validation and error handling
 Integrated Firebase Authentication for user session management
 Set up Firestore to create and store user documents on registration
